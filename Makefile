@@ -1,25 +1,43 @@
+# Compiler
 CC := gcc
-CFLAGS := -g
-LDFLAGS := -pthread
+# Compiler flags
+CFLAGS := -Wall -Wextra -g
+# Library flags
+LFLAGS := -pthread
+# Source directory
+SRC_DIR := ./src
+# Object directory
+OBJ_DIR := ./obj
+# Binary directory
+BIN_DIR := ./bin
+# Target executable name
+TARGET := life
 
-MYSYSTEM_SRC := mysystem.c
-MYSYSTEM_OBJ := $(MYSYSTEM_SRC:.c=.o)
+# Find all source files in the source directory
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+# Generate object file names from source files
+OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-LIFE_SRC := life.c
-LIFE_OBJ := $(LIFE_SRC:.c=.o)
+.PHONY: clean
+# Default target - builds the binary file
+all: $(BIN_DIR)/$(TARGET)
 
-.PHONY: all clean
+# Rule to build the target binary file
+$(BIN_DIR)/$(TARGET): $(OBJS) | $(BIN_DIR)
+	$(CC) $(CFLAGS) $^ -o $@ $(LFLAGS)
 
-all: life
+# Rule to build object files from source files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@ $(LFLAGS)
 
-$(MYSYSTEM_OBJ): $(MYSYSTEM_SRC)
-	$(CC) $(CFLAGS) -c $< -o $@
+# Rule to create the object directory
+$(OBJ_DIR):
+	mkdir -p $@
 
-$(LIFE_OBJ): $(LIFE_SRC)
-	$(CC) $(CFLAGS) -c $< -o $@
+# Rule to create the binary directory
+$(BIN_DIR):
+	mkdir -p $@
 
-life: $(LIFE_OBJ) $(MYSYSTEM_OBJ)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
-
+# Clean rule - removes object and binary directories
 clean:
-	rm -f *.o life
+	rm -rf $(OBJ_DIR) $(BIN_DIR)
