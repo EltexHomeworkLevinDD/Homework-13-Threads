@@ -1,25 +1,25 @@
-CC:=gcc
-CFLAGS:=-g
+CC := gcc
+CFLAGS := -g
+LDFLAGS := -pthread
 
-CUSTOMER_SRC := customer/customer.c
-CUSTOMER_OBJ = $(CUSTOMER_SRC:.c=.o)
-
-SHOP_SRC := shop/shop.c
-SHOP_OBJ = $(SHOP_SRC:.c=.o)
+MYSYSTEM_SRC := mysystem.c
+MYSYSTEM_OBJ := $(MYSYSTEM_SRC:.c=.o)
 
 LIFE_SRC := life.c
-LIFE_OBJ = $(LIFE_SRC:.c=.o)
+LIFE_OBJ := $(LIFE_SRC:.c=.o)
 
-.PHONY: all
+.PHONY: all clean
 
-$(CUSTOMER_OBJ): $(CUSTOMER_SRC)
-	$(CC) $^ $(CFLAGS) -c -o $@ -pthread
+all: life
 
-$(SHOP_OBJ): $(SHOP_SRC)
-	$(CC) $^ $(CFLAGS) -c -o $@ -pthread
+$(MYSYSTEM_OBJ): $(MYSYSTEM_SRC)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(LIFE_OBJ): $(LIFE_SRC)
-	$(CC) $^ $(CFLAGS) -c -o $@ -pthread
+	$(CC) $(CFLAGS) -c $< -o $@
 
-all: $(CUSTOMER_OBJ) $(SHOP_OBJ) $(LIFE_OBJ)
+life: $(LIFE_OBJ) $(MYSYSTEM_OBJ)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
+clean:
+	rm -f *.o life
